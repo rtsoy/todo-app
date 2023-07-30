@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"os"
@@ -55,10 +56,23 @@ func (u UserService) CreateUser(user model.CreateUserDTO) (uuid.UUID, error) {
 	return u.repository.Create(user)
 }
 
-func (u UserService) GenerateToken(user model.User) (string, error) {
+func (u UserService) GenerateToken(email, password string) (string, error) {
+	user, err := u.repository.GetByEmail(email)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", errors.New("wrong credentials")
+		}
+
+		return "", err
+	}
+
+	if ok := checkPasswordHash(password, user.PasswordHash); !ok {
+		return "", errors.New("wrong credentials")
+	}
+
 	claims := jwt.MapClaims{
 		"userID":  user.ID,
-		"expires": time.Now().Add(tokenTTL),
+		"expires": time.Now().UTC().Add(tokenTTL),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -105,6 +119,10 @@ func isUsernameValid(username string) bool {
 func isEmailValid(email string) bool {
 	emailRegex := regexp.MustCompile("^[a-zA-Z0-9._%+-]{3,}@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
 	return emailRegex.MatchString(email)
+}
+
+func checkPasswordHash(password, hash string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
 }
 
 func hashPassword(password string) (string, error) {

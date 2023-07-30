@@ -9,7 +9,7 @@ import (
 
 type UserServicer interface {
 	CreateUser(user model.CreateUserDTO) (uuid.UUID, error)
-	GenerateToken(user model.User) (string, error)
+	GenerateToken(email, password string) (string, error)
 	ParseToken(accessToken string) (jwt.Claims, error)
 }
 
