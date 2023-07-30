@@ -20,12 +20,11 @@ func Run(cfg *config.Config) {
 		log.Fatalf("Error while connecting to the database: %v", err)
 	}
 
-	hndlr := handler.NewHandler()
-	hndlr.InitRoutes(e)
-
 	rpstry := repository.NewRepository(db)
 	svc := service.NewService(rpstry)
-	_ = svc
+	hndlr := handler.NewHandler(svc)
+
+	hndlr.InitRoutes(e)
 
 	e.Logger.Fatal(e.Start(cfg.HTTPPort))
 }
