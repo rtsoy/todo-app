@@ -16,16 +16,12 @@ func (h *Handler) signIn(c echo.Context) error {
 	var input signInInput
 
 	if err := c.Bind(&input); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{
-			"error": "Invalid JSON",
-		})
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid JSON")
 	}
 
 	token, err := h.UserService.GenerateToken(input.Email, input.Password)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{
-			"error": err.Error(),
-		})
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{
@@ -37,16 +33,12 @@ func (h *Handler) signUp(c echo.Context) error {
 	var input model.CreateUserDTO
 
 	if err := c.Bind(&input); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{
-			"error": "Invalid JSON",
-		})
+		return echo.NewHTTPError(http.StatusBadRequest, "Invalid JSON")
 	}
 
 	id, err := h.UserService.CreateUser(input)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"error": err.Error(),
-		})
+		return echo.NewHTTPError(http.StatusConflict, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{

@@ -53,7 +53,20 @@ func (u UserService) CreateUser(user model.CreateUserDTO) (uuid.UUID, error) {
 	}
 	user.Password = hashedPassword
 
-	return u.repository.Create(user)
+	id, err := u.repository.Create(user)
+	if err != nil {
+		if err.Error() == "pq: duplicate key value violates unique constraint \"users_email_key\"" {
+			return uuid.Nil, errors.New("email is already taken")
+		}
+
+		if err.Error() == "pq: duplicate key value violates unique constraint \"users_username_key\"" {
+			return uuid.Nil, errors.New("username is already taken")
+		}
+
+		return uuid.Nil, err
+	}
+
+	return id, nil
 }
 
 func (u UserService) GenerateToken(email, password string) (string, error) {
