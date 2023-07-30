@@ -10,7 +10,7 @@ import (
 type UserServicer interface {
 	CreateUser(user model.CreateUserDTO) (uuid.UUID, error)
 	GenerateToken(email, password string) (string, error)
-	ParseToken(accessToken string) (jwt.Claims, error)
+	ParseToken(accessToken string) (jwt.MapClaims, error)
 }
 
 type Service struct {

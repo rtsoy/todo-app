@@ -17,7 +17,7 @@ import (
 
 const (
 	bcryptCost = 12
-	tokenTTL   = 1 * time.Hour
+	tokenTTL   = 24 * time.Hour
 )
 
 type UserService struct {
@@ -95,7 +95,7 @@ func (u UserService) GenerateToken(email, password string) (string, error) {
 	return token.SignedString([]byte(secret))
 }
 
-func (u UserService) ParseToken(accessToken string) (jwt.Claims, error) {
+func (u UserService) ParseToken(accessToken string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
