@@ -6,6 +6,7 @@ require github.com/labstack/echo/v4 v4.11.1
 
 require (
 	github.com/BurntSushi/toml v1.3.2 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/ilyakaznacheev/cleanenv v1.5.0 // indirect
 	github.com/jmoiron/sqlx v1.3.5 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect

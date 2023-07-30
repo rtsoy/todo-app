@@ -7,6 +7,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/rtsoy/todo-app/config"
 	"github.com/rtsoy/todo-app/internal/handler"
+	"github.com/rtsoy/todo-app/internal/repository"
 	"github.com/rtsoy/todo-app/pkg/postgresql"
 )
 
@@ -17,10 +18,12 @@ func Run(cfg *config.Config) {
 	if err != nil {
 		log.Fatalf("Error while connecting to the database: %v", err)
 	}
-	_ = db
 
 	hndlr := handler.NewHandler()
 	hndlr.InitRoutes(e)
+
+	rpstry := repository.NewRepository(db)
+	_ = rpstry
 
 	e.Logger.Fatal(e.Start(cfg.HTTPPort))
 }
