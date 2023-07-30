@@ -8,6 +8,7 @@ import (
 	"github.com/rtsoy/todo-app/config"
 	"github.com/rtsoy/todo-app/internal/handler"
 	"github.com/rtsoy/todo-app/internal/repository"
+	"github.com/rtsoy/todo-app/internal/service"
 	"github.com/rtsoy/todo-app/pkg/postgresql"
 )
 
@@ -23,7 +24,8 @@ func Run(cfg *config.Config) {
 	hndlr.InitRoutes(e)
 
 	rpstry := repository.NewRepository(db)
-	_ = rpstry
+	svc := service.NewService(rpstry)
+	_ = svc
 
 	e.Logger.Fatal(e.Start(cfg.HTTPPort))
 }
