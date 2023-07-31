@@ -1,8 +1,7 @@
 package handler
 
 import (
-	"net/http"
-
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/rtsoy/todo-app/internal/service"
 )
@@ -26,8 +25,26 @@ func (h *Handler) InitRoutes(e *echo.Echo) {
 
 	api := e.Group("/api", h.JWTAuthentication)
 	{
-		api.GET("/", func(c echo.Context) error {
-			return c.String(http.StatusOK, "Hello from protected route! :)")
-		})
+		lists := api.Group("/lists")
+		{
+			lists.POST("/", h.createList)
+			lists.GET("/", h.getAllLists)
+			lists.GET("/:id", h.getListByID)
+			lists.PATCH("/:id", h.updateList)
+			lists.DELETE("/:id", h.deleteList)
+		}
 	}
+}
+
+func getIDFromParams(c echo.Context) (uuid.UUID, error) {
+	paramsId := c.Param("id")
+
+	return uuid.Parse(paramsId)
+}
+
+func getContextUserID(c echo.Context) uuid.UUID {
+	ctxUserIDValue := c.Get(ctxUserID).(string)
+	userID, _ := uuid.Parse(ctxUserIDValue)
+
+	return userID
 }
