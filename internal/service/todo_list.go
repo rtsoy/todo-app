@@ -47,6 +47,10 @@ func (s *TodoListService) GetAll(userID uuid.UUID) ([]model.TodoList, error) {
 		return lists, err
 	}
 
+	if lists == nil {
+		return lists, errors.New("no todo lists found")
+	}
+
 	return lists, err
 }
 
@@ -67,6 +71,14 @@ func (s *TodoListService) GetByID(userID, listID uuid.UUID) (model.TodoList, err
 func (s *TodoListService) Update(userID, listID uuid.UUID, data model.CreateTodoListDTO) error {
 	if data.Title == "" && data.Description == "" {
 		return errors.New("title and description cannot be empty")
+	}
+
+	if len(data.Title) < minListTileLength && len(data.Title) > 0 {
+		return errors.New("title length is too short")
+	}
+
+	if len(data.Description) < minListDescriptionLength && len(data.Description) > 0 {
+		return errors.New("description length is too short")
 	}
 
 	return s.repository.Update(userID, listID, data)
