@@ -13,12 +13,22 @@ type UserServicer interface {
 	ParseToken(accessToken string) (jwt.MapClaims, error)
 }
 
+type TodoListServicer interface {
+	Create(userID uuid.UUID, list model.CreateTodoListDTO) (uuid.UUID, error)
+	GetAll(userID uuid.UUID) ([]model.TodoList, error)
+	GetByID(userID, listID uuid.UUID) (model.TodoList, error)
+	Update(userID, listID uuid.UUID, data model.CreateTodoListDTO) error
+	Delete(userID, listID uuid.UUID) error
+}
+
 type Service struct {
-	UserService UserServicer
+	UserService     UserServicer
+	TodoListService TodoListServicer
 }
 
 func NewService(repository *repository.Repository) *Service {
 	return &Service{
-		UserService: NewUserService(repository.UserRepository),
+		TodoListService: NewTodoListService(repository.TodoListRepository),
+		UserService:     NewUserService(repository.UserRepository),
 	}
 }

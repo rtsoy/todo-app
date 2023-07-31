@@ -16,8 +16,9 @@ import (
 )
 
 const (
-	bcryptCost = 12
-	tokenTTL   = 24 * time.Hour
+	bcryptCost        = 12
+	tokenTTL          = 24 * time.Hour
+	minPasswordLength = 8
 )
 
 type UserService struct {
@@ -117,7 +118,7 @@ func (u UserService) ParseToken(accessToken string) (jwt.MapClaims, error) {
 
 // Enforces that the password must be at least 8 characters long
 func isPasswordValid(password string) bool {
-	return len(password) > 8
+	return len(password) > minPasswordLength
 }
 
 // Ensures that the input string contains only letters (uppercase and lowercase),
