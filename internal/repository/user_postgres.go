@@ -28,11 +28,8 @@ func (r *UserRepositoryPostgres) GetByEmail(email string) (*model.User, error) {
 	`, usersTable)
 
 	var user model.User
-	if err := r.db.Get(&user, query, email); err != nil {
-		return nil, err
-	}
 
-	return &user, nil
+	return &user, r.db.Get(&user, query, email)
 }
 
 func (r *UserRepositoryPostgres) Create(user model.CreateUserDTO) (uuid.UUID, error) {
@@ -43,9 +40,5 @@ func (r *UserRepositoryPostgres) Create(user model.CreateUserDTO) (uuid.UUID, er
 
 	id := uuid.New()
 
-	if row := r.db.QueryRow(query, id, user.Email, user.Username, user.Password); row.Err() != nil {
-		return uuid.Nil, row.Err()
-	}
-
-	return id, nil
+	return id, r.db.QueryRow(query, id, user.Email, user.Username, user.Password).Err()
 }
