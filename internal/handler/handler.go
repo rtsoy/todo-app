@@ -27,16 +27,16 @@ func (h *Handler) InitRoutes(e *echo.Echo) {
 	{
 		lists := api.Group("/lists")
 		{
-			lists.POST("/", h.createList)
-			lists.GET("/", h.getAllLists)
+			lists.POST("", h.createList)
+			lists.GET("", h.getAllLists)
 			lists.GET("/:listID", h.getListByID)
 			lists.PATCH("/:listID", h.updateList)
 			lists.DELETE("/:listID", h.deleteList)
 
 			items := lists.Group("/:listID/items")
 			{
-				items.POST("/", h.createItem)
-				items.GET("/", h.getAllItems)
+				items.POST("", h.createItem)
+				items.GET("", h.getAllItems)
 				items.GET("/:itemID", h.getItemByID)
 				items.PATCH("/:itemID", h.updateItem)
 				items.DELETE("/:itemID", h.deleteItem)

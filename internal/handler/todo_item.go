@@ -66,12 +66,21 @@ func (h *Handler) getAllItems(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid list id")
 	}
 
-	items, err := h.TodoItemService.GetAll(userID, listID)
+	var pagination model.Pagination
+	if err := c.Bind(&pagination); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, "invalid url query")
+	}
+
+	items, err := h.TodoItemService.GetAll(userID, listID, &pagination)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, items)
+	return c.JSON(http.StatusOK, resourceResponse{
+		Count:      len(items),
+		Results:    items,
+		Pagination: pagination,
+	})
 }
 
 func (h *Handler) createItem(c echo.Context) error {

@@ -53,8 +53,16 @@ func (s *TodoItemService) Create(userID, listID uuid.UUID, item model.CreateTodo
 	return s.repository.Create(listID, item)
 }
 
-func (s *TodoItemService) GetAll(userID, listID uuid.UUID) ([]model.TodoItem, error) {
-	items, err := s.repository.GetAll(userID, listID)
+func (s *TodoItemService) GetAll(userID, listID uuid.UUID, pagination *model.Pagination) ([]model.TodoItem, error) {
+	if pagination.Limit == 0 {
+		pagination.Limit = 5
+	}
+
+	if pagination.Page == 0 {
+		pagination.Page = 1
+	}
+
+	items, err := s.repository.GetAll(userID, listID, pagination)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return items, errors.New("no todo items found")
