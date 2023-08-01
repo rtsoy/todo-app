@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS lists_items;
+DROP TABLE IF EXISTS todo_items;
