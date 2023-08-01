@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -71,6 +72,8 @@ func (h *Handler) getAllItems(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid url query")
 	}
 
+	fmt.Println(c.QueryParams())
+
 	items, err := h.TodoItemService.GetAll(userID, listID, &pagination)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
@@ -79,7 +82,7 @@ func (h *Handler) getAllItems(c echo.Context) error {
 	return c.JSON(http.StatusOK, resourceResponse{
 		Count:      len(items),
 		Results:    items,
-		Pagination: pagination,
+		Pagination: &pagination,
 	})
 }
 

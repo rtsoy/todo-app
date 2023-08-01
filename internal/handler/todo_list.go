@@ -66,7 +66,11 @@ func (h *Handler) getAllLists(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, lists)
+	return c.JSON(http.StatusOK, resourceResponse{
+		Count:      len(lists),
+		Results:    lists,
+		Pagination: nil,
+	})
 }
 
 func (h *Handler) createList(c echo.Context) error {
