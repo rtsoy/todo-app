@@ -13,6 +13,7 @@ import (
 const (
 	minListTitleLength       = 3
 	minListDescriptionLength = 3
+	maxListsPerUser          = 5
 )
 
 type TodoListService struct {
@@ -26,6 +27,15 @@ func NewTodoListService(repository repository.TodoListRepository) TodoListServic
 }
 
 func (s *TodoListService) Create(userID uuid.UUID, list model.CreateTodoListDTO) (uuid.UUID, error) {
+	totalLists, err := s.repository.GetAll(userID)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return uuid.Nil, err
+	}
+
+	if len(totalLists) >= maxListsPerUser {
+		return uuid.Nil, errors.New("exceeded the maximum allowed limit of existing lists")
+	}
+
 	if len(list.Title) < minListTitleLength {
 		return uuid.Nil, errors.New("title length is too short")
 	}
@@ -51,7 +61,7 @@ func (s *TodoListService) GetAll(userID uuid.UUID) ([]model.TodoList, error) {
 		return lists, errors.New("no todo lists found")
 	}
 
-	return lists, err
+	return lists, nil
 }
 
 func (s *TodoListService) GetByID(userID, listID uuid.UUID) (model.TodoList, error) {
@@ -64,7 +74,7 @@ func (s *TodoListService) GetByID(userID, listID uuid.UUID) (model.TodoList, err
 		return list, err
 	}
 
-	return list, err
+	return list, nil
 }
 
 func (s *TodoListService) Update(userID, listID uuid.UUID, data model.UpdateTodoListDTO) error {
