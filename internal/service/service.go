@@ -11,7 +11,7 @@ type TodoItemServicer interface {
 	Create(userID, listID uuid.UUID, item model.CreateTodoItemDTO) (uuid.UUID, error)
 	GetAll(userID, listID uuid.UUID) ([]model.TodoItem, error)
 	GetByID(userID, itemID uuid.UUID) (model.TodoItem, error)
-	Update(userID, itemID uuid.UUID, data model.CreateTodoItemDTO) error
+	Update(userID, itemID uuid.UUID, data model.UpdateTodoItemDTO) error
 	Delete(userID, itemID uuid.UUID) error
 }
 

@@ -82,27 +82,33 @@ func (r *TodoItemRepositoryPostgres) GetByID(userID, itemID uuid.UUID) (model.To
 	return item, r.db.Get(&item, query, userID, itemID)
 }
 
-func (r *TodoItemRepositoryPostgres) Update(userID, itemID uuid.UUID, data model.CreateTodoItemDTO) error {
+func (r *TodoItemRepositoryPostgres) Update(userID, itemID uuid.UUID, data model.UpdateTodoItemDTO) error {
 	toUpdate := make([]string, 0)
 
 	args := make([]interface{}, 0)
 	argsID := 1
 
-	if data.Title != "" {
+	if data.Title != nil {
 		toUpdate = append(toUpdate, fmt.Sprintf("title=$%d", argsID))
-		args = append(args, data.Title)
+		args = append(args, *data.Title)
 		argsID++
 	}
 
-	if data.Description != "" {
+	if data.Description != nil {
 		toUpdate = append(toUpdate, fmt.Sprintf("description=$%d", argsID))
-		args = append(args, data.Description)
+		args = append(args, *data.Description)
 		argsID++
 	}
 
-	if !data.Deadline.IsZero() {
+	if data.Deadline != nil {
 		toUpdate = append(toUpdate, fmt.Sprintf("deadline=$%d", argsID))
-		args = append(args, data.Deadline)
+		args = append(args, *data.Deadline)
+		argsID++
+	}
+
+	if data.Completed != nil {
+		toUpdate = append(toUpdate, fmt.Sprintf("completed=$%d", argsID))
+		args = append(args, *data.Completed)
 		argsID++
 	}
 

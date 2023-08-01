@@ -30,7 +30,7 @@ func (h *Handler) updateItem(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid id")
 	}
 
-	var input model.CreateTodoItemDTO
+	var input model.UpdateTodoItemDTO
 	if err := c.Bind(&input); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid JSON")
 	}

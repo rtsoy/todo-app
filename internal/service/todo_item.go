@@ -3,6 +3,7 @@ package service
 import (
 	"database/sql"
 	"errors"
+	"reflect"
 	"time"
 
 	"github.com/google/uuid"
@@ -38,6 +39,11 @@ func (s *TodoItemService) Create(userID, listID uuid.UUID, item model.CreateTodo
 
 	if len(item.Description) < minItemDescriptionLength {
 		return uuid.Nil, errors.New("description length is too short")
+	}
+
+	// Default deadline is 7 days
+	if item.Deadline.IsZero() {
+		item.Deadline = time.Now().UTC().AddDate(0, 0, 7)
 	}
 
 	if time.Now().UTC().After(item.Deadline.UTC()) {
@@ -77,22 +83,21 @@ func (s *TodoItemService) GetByID(userID, itemID uuid.UUID) (model.TodoItem, err
 	return list, nil
 }
 
-func (s *TodoItemService) Update(userID, itemID uuid.UUID, data model.CreateTodoItemDTO) error {
-	if data.Title == "" && data.Description == "" && data.Deadline.IsZero() {
-		return errors.New("title, description and deadline cannot be empty")
+func (s *TodoItemService) Update(userID, itemID uuid.UUID, data model.UpdateTodoItemDTO) error {
+	if reflect.DeepEqual(data, model.UpdateTodoItemDTO{}) {
+		return errors.New("there is no values to update")
 	}
 
-	if len(data.Title) < minItemTitleLength && len(data.Title) > 0 {
+	if data.Title != nil && len(*data.Title) < minItemTitleLength && len(*data.Title) > 0 {
 		return errors.New("title length is too short")
 	}
 
-	if len(data.Description) < minItemDescriptionLength && len(data.Description) > 0 {
+	if data.Description != nil && len(*data.Description) < minItemDescriptionLength && len(*data.Description) > 0 {
 		return errors.New("description length is too short")
 	}
 
 	item, _ := s.repository.GetByID(userID, itemID)
-
-	if item.CreatedAt.After(data.Deadline) {
+	if data.Deadline != nil && item.CreatedAt.After(*data.Deadline) {
 		return errors.New("deadline cannot be in the past")
 	}
 

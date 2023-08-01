@@ -6,6 +6,13 @@ import (
 	"github.com/google/uuid"
 )
 
+type UpdateTodoItemDTO struct {
+	Title       *string    `json:"title"`
+	Description *string    `json:"description"`
+	Deadline    *time.Time `json:"deadline"`
+	Completed   *bool      `json:"completed"`
+}
+
 type CreateTodoItemDTO struct {
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
@@ -19,10 +26,4 @@ type TodoItem struct {
 	CreatedAt   time.Time `json:"createdAt" db:"created_at"`
 	Deadline    time.Time `json:"deadline"`
 	Completed   bool      `json:"completed"`
-}
-
-type ListItem struct {
-	ID     uuid.UUID
-	ListID uuid.UUID
-	ItemID uuid.UUID
 }
