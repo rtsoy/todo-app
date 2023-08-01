@@ -32,6 +32,15 @@ func (h *Handler) InitRoutes(e *echo.Echo) {
 			lists.GET("/:listID", h.getListByID)
 			lists.PATCH("/:listID", h.updateList)
 			lists.DELETE("/:listID", h.deleteList)
+
+			items := lists.Group("/:listID/items")
+			{
+				items.POST("/", h.createItem)
+				items.GET("/", h.getAllItems)
+				items.GET("/:itemID", h.getItemByID)
+				items.PATCH("/:itemID", h.updateItem)
+				items.DELETE("/:itemID", h.deleteItem)
+			}
 		}
 	}
 }
