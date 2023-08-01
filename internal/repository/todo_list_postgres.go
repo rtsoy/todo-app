@@ -81,21 +81,21 @@ func (r *TodoListRepositoryPostgres) GetByID(userID, listID uuid.UUID) (model.To
 	return list, r.db.Get(&list, query, userID, listID)
 }
 
-func (r *TodoListRepositoryPostgres) Update(userID, listID uuid.UUID, data model.CreateTodoListDTO) error {
+func (r *TodoListRepositoryPostgres) Update(userID, listID uuid.UUID, data model.UpdateTodoListDTO) error {
 	toUpdate := make([]string, 0)
 
 	args := make([]interface{}, 0)
 	argsID := 1
 
-	if data.Title != "" {
+	if data.Title != nil {
 		toUpdate = append(toUpdate, fmt.Sprintf("title=$%d", argsID))
-		args = append(args, data.Title)
+		args = append(args, *data.Title)
 		argsID++
 	}
 
-	if data.Description != "" {
+	if data.Description != nil {
 		toUpdate = append(toUpdate, fmt.Sprintf("description=$%d", argsID))
-		args = append(args, data.Description)
+		args = append(args, *data.Description)
 		argsID++
 	}
 

@@ -3,6 +3,7 @@ package service
 import (
 	"database/sql"
 	"errors"
+	"reflect"
 
 	"github.com/google/uuid"
 	"github.com/rtsoy/todo-app/internal/model"
@@ -10,7 +11,7 @@ import (
 )
 
 const (
-	minListTileLength        = 3
+	minListTitleLength       = 3
 	minListDescriptionLength = 3
 )
 
@@ -25,7 +26,7 @@ func NewTodoListService(repository repository.TodoListRepository) TodoListServic
 }
 
 func (s *TodoListService) Create(userID uuid.UUID, list model.CreateTodoListDTO) (uuid.UUID, error) {
-	if len(list.Title) < minListTileLength {
+	if len(list.Title) < minListTitleLength {
 		return uuid.Nil, errors.New("title length is too short")
 	}
 
@@ -38,7 +39,6 @@ func (s *TodoListService) Create(userID uuid.UUID, list model.CreateTodoListDTO)
 
 func (s *TodoListService) GetAll(userID uuid.UUID) ([]model.TodoList, error) {
 	lists, err := s.repository.GetAll(userID)
-
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return lists, errors.New("no todo lists found")
@@ -56,7 +56,6 @@ func (s *TodoListService) GetAll(userID uuid.UUID) ([]model.TodoList, error) {
 
 func (s *TodoListService) GetByID(userID, listID uuid.UUID) (model.TodoList, error) {
 	list, err := s.repository.GetByID(userID, listID)
-
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return list, errors.New("todo list not found")
@@ -68,16 +67,16 @@ func (s *TodoListService) GetByID(userID, listID uuid.UUID) (model.TodoList, err
 	return list, err
 }
 
-func (s *TodoListService) Update(userID, listID uuid.UUID, data model.CreateTodoListDTO) error {
-	if data.Title == "" && data.Description == "" {
-		return errors.New("title and description cannot be empty")
+func (s *TodoListService) Update(userID, listID uuid.UUID, data model.UpdateTodoListDTO) error {
+	if reflect.DeepEqual(data, model.UpdateTodoListDTO{}) {
+		return errors.New("there is no values to update")
 	}
 
-	if len(data.Title) < minListTileLength && len(data.Title) > 0 {
+	if data.Title != nil && len(*data.Title) < minListTitleLength && len(*data.Title) > 0 {
 		return errors.New("title length is too short")
 	}
 
-	if len(data.Description) < minListDescriptionLength && len(data.Description) > 0 {
+	if data.Description != nil && len(*data.Description) < minListDescriptionLength && len(*data.Description) > 0 {
 		return errors.New("description length is too short")
 	}
 

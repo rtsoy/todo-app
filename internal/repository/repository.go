@@ -18,7 +18,7 @@ type TodoListRepository interface {
 	Create(userID uuid.UUID, list model.CreateTodoListDTO) (uuid.UUID, error)
 	GetAll(userID uuid.UUID) ([]model.TodoList, error)
 	GetByID(userID, listID uuid.UUID) (model.TodoList, error)
-	Update(userID, listID uuid.UUID, data model.CreateTodoListDTO) error
+	Update(userID, listID uuid.UUID, data model.UpdateTodoListDTO) error
 	Delete(userID, listID uuid.UUID) error
 }
 
