@@ -29,15 +29,15 @@ func (h *Handler) InitRoutes(e *echo.Echo) {
 		{
 			lists.POST("/", h.createList)
 			lists.GET("/", h.getAllLists)
-			lists.GET("/:id", h.getListByID)
-			lists.PATCH("/:id", h.updateList)
-			lists.DELETE("/:id", h.deleteList)
+			lists.GET("/:listID", h.getListByID)
+			lists.PATCH("/:listID", h.updateList)
+			lists.DELETE("/:listID", h.deleteList)
 		}
 	}
 }
 
-func getIDFromParams(c echo.Context) (uuid.UUID, error) {
-	paramsId := c.Param("id")
+func getValueFromParams(c echo.Context, v string) (uuid.UUID, error) {
+	paramsId := c.Param(v)
 
 	return uuid.Parse(paramsId)
 }

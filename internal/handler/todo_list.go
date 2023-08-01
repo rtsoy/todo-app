@@ -10,7 +10,7 @@ import (
 func (h *Handler) deleteList(c echo.Context) error {
 	userID := getContextUserID(c)
 
-	listID, err := getIDFromParams(c)
+	listID, err := getValueFromParams(c, "listID")
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid id")
 	}
@@ -25,7 +25,7 @@ func (h *Handler) deleteList(c echo.Context) error {
 func (h *Handler) updateList(c echo.Context) error {
 	userID := getContextUserID(c)
 
-	listID, err := getIDFromParams(c)
+	listID, err := getValueFromParams(c, "listID")
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid id")
 	}
@@ -45,7 +45,7 @@ func (h *Handler) updateList(c echo.Context) error {
 func (h *Handler) getListByID(c echo.Context) error {
 	userID := getContextUserID(c)
 
-	listID, err := getIDFromParams(c)
+	listID, err := getValueFromParams(c, "listID")
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "invalid id")
 	}
