@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"reflect"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/rtsoy/todo-app/internal/model"
@@ -27,7 +28,7 @@ func NewTodoListService(repository repository.TodoListRepository) TodoListServic
 }
 
 func (s *TodoListService) Create(userID uuid.UUID, list model.CreateTodoListDTO) (uuid.UUID, error) {
-	totalLists, err := s.repository.GetAll(userID)
+	totalLists, err := s.repository.GetAll(userID, nil)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return uuid.Nil, err
 	}
@@ -47,8 +48,12 @@ func (s *TodoListService) Create(userID uuid.UUID, list model.CreateTodoListDTO)
 	return s.repository.Create(userID, list)
 }
 
-func (s *TodoListService) GetAll(userID uuid.UUID) ([]model.TodoList, error) {
-	lists, err := s.repository.GetAll(userID)
+func (s *TodoListService) GetAll(userID uuid.UUID, orderBy *string) ([]model.TodoList, error) {
+	if orderBy != nil {
+		orderBy = verifyListOrderByString(orderBy)
+	}
+
+	lists, err := s.repository.GetAll(userID, orderBy)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return lists, errors.New("no todo lists found")
@@ -95,4 +100,28 @@ func (s *TodoListService) Update(userID, listID uuid.UUID, data model.UpdateTodo
 
 func (s *TodoListService) Delete(userID, listID uuid.UUID) error {
 	return s.repository.Delete(userID, listID)
+}
+
+func verifyListOrderByString(orderBy *string) *string {
+	value := *orderBy
+
+	value = strings.TrimSpace(value)
+	value = strings.ToLower(value)
+
+	sortDirection := " ASC"
+	if strings.HasPrefix(value, "-") {
+		value = strings.Replace(value, "-", "", -1)
+		sortDirection = " DESC"
+	}
+
+	switch value {
+	case "title":
+		toReturn := value + sortDirection
+		return &toReturn
+	case "createdat":
+		toReturn := "created_at" + sortDirection
+		return &toReturn
+	default:
+		return nil
+	}
 }

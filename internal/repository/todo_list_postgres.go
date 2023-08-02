@@ -55,13 +55,17 @@ func (r *TodoListRepositoryPostgres) Create(userID uuid.UUID, list model.CreateT
 	return listID, tx.Commit()
 }
 
-func (r *TodoListRepositoryPostgres) GetAll(userID uuid.UUID) ([]model.TodoList, error) {
+func (r *TodoListRepositoryPostgres) GetAll(userID uuid.UUID, orderBy *string) ([]model.TodoList, error) {
 	query := fmt.Sprintf(`
 		SELECT tl.id, tl.title, tl.description, tl.created_at
 		FROM %s tl
 		INNER JOIN %s ul ON tl.id = ul.list_id
 		WHERE ul.user_id = $1
     `, todoListsTable, usersListsTable)
+
+	if orderBy != nil {
+		query += fmt.Sprintf("ORDER BY tl.%s\n", *orderBy)
+	}
 
 	var lists []model.TodoList
 
