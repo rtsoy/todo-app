@@ -55,7 +55,7 @@ func (r *TodoItemRepositoryPostgres) Create(listID uuid.UUID, item model.CreateT
 	return itemID, tx.Commit()
 }
 
-func (r *TodoItemRepositoryPostgres) GetAll(userID, listID uuid.UUID, pagination *model.Pagination) ([]model.TodoItem, error) {
+func (r *TodoItemRepositoryPostgres) GetAll(userID, listID uuid.UUID, pagination *model.Pagination, orderBy *string) ([]model.TodoItem, error) {
 	query := fmt.Sprintf(`
 		SELECT ti.id, ti.title, ti.description, ti.created_at, ti.deadline, ti.completed
 		FROM %s ti
@@ -63,6 +63,10 @@ func (r *TodoItemRepositoryPostgres) GetAll(userID, listID uuid.UUID, pagination
 		INNER JOIN %s ul ON ul.list_id = li.list_id
 		WHERE ul.user_id = $1 AND li.list_id = $2
     `, todoItemsTable, listsItemsTable, usersListsTable)
+
+	if orderBy != nil {
+		query += fmt.Sprintf("ORDER BY ti.%s\n", *orderBy)
+	}
 
 	query += fmt.Sprintf("LIMIT %d OFFSET %d", pagination.Limit, pagination.Limit*(pagination.Page-1))
 

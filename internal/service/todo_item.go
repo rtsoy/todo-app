@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -53,7 +54,7 @@ func (s *TodoItemService) Create(userID, listID uuid.UUID, item model.CreateTodo
 	return s.repository.Create(listID, item)
 }
 
-func (s *TodoItemService) GetAll(userID, listID uuid.UUID, pagination *model.Pagination) ([]model.TodoItem, error) {
+func (s *TodoItemService) GetAll(userID, listID uuid.UUID, pagination *model.Pagination, orderBy *string) ([]model.TodoItem, error) {
 	if pagination.Limit == 0 {
 		pagination.Limit = 5
 	}
@@ -62,7 +63,11 @@ func (s *TodoItemService) GetAll(userID, listID uuid.UUID, pagination *model.Pag
 		pagination.Page = 1
 	}
 
-	items, err := s.repository.GetAll(userID, listID, pagination)
+	if orderBy != nil {
+		orderBy = verifyItemOrderByString(orderBy)
+	}
+
+	items, err := s.repository.GetAll(userID, listID, pagination, orderBy)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return items, errors.New("no todo items found")
@@ -114,4 +119,28 @@ func (s *TodoItemService) Update(userID, itemID uuid.UUID, data model.UpdateTodo
 
 func (s *TodoItemService) Delete(userID, itemID uuid.UUID) error {
 	return s.repository.Delete(userID, itemID)
+}
+
+func verifyItemOrderByString(orderBy *string) *string {
+	value := *orderBy
+
+	value = strings.TrimSpace(value)
+	value = strings.ToLower(value)
+
+	sortDirection := " ASC"
+	if strings.HasPrefix(value, "-") {
+		value = strings.Replace(value, "-", "", -1)
+		sortDirection = " DESC"
+	}
+
+	switch value {
+	case "title", "deadline", "completed":
+		toReturn := value + sortDirection
+		return &toReturn
+	case "createdat":
+		toReturn := "created_at" + sortDirection
+		return &toReturn
+	default:
+		return nil
+	}
 }
