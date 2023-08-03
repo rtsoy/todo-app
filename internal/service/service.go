@@ -7,6 +7,8 @@ import (
 	"github.com/rtsoy/todo-app/internal/repository"
 )
 
+//go:generate mockgen -source=service.go -destination=mocks/mock.go
+
 type TodoItemServicer interface {
 	Create(userID, listID uuid.UUID, item model.CreateTodoItemDTO) (uuid.UUID, error)
 	GetAll(userID, listID uuid.UUID, pagination *model.Pagination, orderBy *string) ([]model.TodoItem, error)
