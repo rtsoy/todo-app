@@ -62,8 +62,13 @@ func (h *Handler) getAllLists(c echo.Context) error {
 	userID := getContextUserID(c)
 
 	orderBy := c.QueryParam("sort_by")
-	
-	lists, err := h.TodoListService.GetAll(userID, &orderBy)
+
+	orderByPtr := &orderBy
+	if orderBy == "" {
+		orderByPtr = nil
+	}
+
+	lists, err := h.TodoListService.GetAll(userID, orderByPtr)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}
