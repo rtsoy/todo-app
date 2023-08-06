@@ -73,7 +73,12 @@ func (h *Handler) getAllItems(c echo.Context) error {
 
 	orderBy := c.QueryParam("sort_by")
 
-	items, err := h.TodoItemService.GetAll(userID, listID, &pagination, &orderBy)
+	orderByPtr := &orderBy
+	if orderBy == "" {
+		orderByPtr = nil
+	}
+
+	items, err := h.TodoItemService.GetAll(userID, listID, &pagination, orderByPtr)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusNotFound, err.Error())
 	}

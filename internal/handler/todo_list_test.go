@@ -269,7 +269,8 @@ func TestHandler_getListByID(t *testing.T) {
 			e.GET("/get-list-by-id/:listID", handler.getListByID)
 
 			w := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/get-list-by-id/%s", test.listIDStr), nil)
+			req := httptest.NewRequest(http.MethodGet, fmt.Sprintf(
+				"/get-list-by-id/%s", test.listIDStr), nil)
 			req.Header.Add("Content-Type", "application/json")
 
 			ctx := e.NewContext(req, w)
