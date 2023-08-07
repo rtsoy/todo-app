@@ -7,6 +7,16 @@ import (
 	"github.com/rtsoy/todo-app/internal/model"
 )
 
+// @Summary Delete an item
+// @Description Delete an item by its ID
+// @Tags Items
+// @Produce json
+// @Security ApiKeyAuth
+// @Param itemID path string true "Item ID"
+// @Success 204 "No Content"
+// @Failure 400 {object} swaggerErrorResponse
+// @Failure 500 {object} swaggerErrorResponse
+// @Router /api/lists/{listID}/items/{itemID} [delete]
 func (h *Handler) deleteItem(c echo.Context) error {
 	userID := getContextUserID(c)
 
@@ -22,6 +32,17 @@ func (h *Handler) deleteItem(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
+// @Summary Update an item
+// @Description Update an item by its ID
+// @Tags Items
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param itemID path string true "Item ID"
+// @Param input body model.UpdateTodoItemDTO true "Updated item data"
+// @Success 200 "No Content"
+// @Failure 400 {object} swaggerErrorResponse
+// @Router /api/lists/{listID}/items/{itemID} [patch]
 func (h *Handler) updateItem(c echo.Context) error {
 	userID := getContextUserID(c)
 
@@ -42,6 +63,16 @@ func (h *Handler) updateItem(c echo.Context) error {
 	return c.NoContent(http.StatusOK)
 }
 
+// @Summary Get an item by ID
+// @Description Get an item by its ID
+// @Tags Items
+// @Produce json
+// @Security ApiKeyAuth
+// @Param itemID path string true "Item ID"
+// @Success 200 {object} model.TodoItem
+// @Failure 400 {object} swaggerErrorResponse
+// @Failure 404 {object} swaggerErrorResponse
+// @Router /api/lists/{listID}/items/{itemID} [get]
 func (h *Handler) getItemByID(c echo.Context) error {
 	userID := getContextUserID(c)
 
@@ -58,6 +89,18 @@ func (h *Handler) getItemByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, item)
 }
 
+// @Summary Get all items
+// @Description Get all items for a specific list
+// @Tags Items
+// @Produce json
+// @Security ApiKeyAuth
+// @Param listID path string true "List ID"
+// @Param sort_by query string false "Sort items by"
+// @Param pagination query model.Pagination false "Pagination options"
+// @Success 200 {object} resourceResponse
+// @Failure 400 {object} swaggerErrorResponse
+// @Failure 404 {object} swaggerErrorResponse
+// @Router /api/lists/{listID}/items [get]
 func (h *Handler) getAllItems(c echo.Context) error {
 	userID := getContextUserID(c)
 
@@ -90,6 +133,17 @@ func (h *Handler) getAllItems(c echo.Context) error {
 	})
 }
 
+// @Summary Create an item
+// @Description Create a new item for a specific list
+// @Tags Items
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param listID path string true "List ID"
+// @Param input body model.CreateTodoItemDTO true "New item data"
+// @Success 201 {object} createResponse
+// @Failure 400 {object} swaggerErrorResponse
+// @Router /api/lists/{listID}/items [post]
 func (h *Handler) createItem(c echo.Context) error {
 	userID := getContextUserID(c)
 
@@ -108,7 +162,5 @@ func (h *Handler) createItem(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, echo.Map{
-		"id": id,
-	})
+	return c.JSON(http.StatusCreated, createResponse{ID: id.String()})
 }

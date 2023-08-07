@@ -1,0 +1,469 @@
+basePath: /
+definitions:
+  handler.createResponse:
+    properties:
+      id:
+        type: string
+    type: object
+  handler.resourceResponse:
+    properties:
+      count:
+        type: integer
+      pagination:
+        $ref: '#/definitions/model.Pagination'
+      results: {}
+    type: object
+  handler.signInInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  handler.signInResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  handler.swaggerErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  model.CreateTodoItemDTO:
+    properties:
+      deadline:
+        type: string
+      description:
+        type: string
+      title:
+        type: string
+    type: object
+  model.CreateTodoListDTO:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+    type: object
+  model.CreateUserDTO:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  model.Pagination:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+    type: object
+  model.TodoItem:
+    properties:
+      completed:
+        type: boolean
+      createdAt:
+        type: string
+      deadline:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  model.TodoList:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  model.UpdateTodoItemDTO:
+    properties:
+      completed:
+        type: boolean
+      deadline:
+        type: string
+      description:
+        type: string
+      title:
+        type: string
+    type: object
+  model.UpdateTodoListDTO:
+    properties:
+      description:
+        type: string
+      title:
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: A server for TodoApp Application
+  title: TodoApp API
+  version: "1.0"
+paths:
+  /api/lists:
+    get:
+      description: Get all lists
+      parameters:
+      - description: Sort lists by
+        in: query
+        name: sort_by
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.resourceResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all lists
+      tags:
+      - Lists
+    post:
+      consumes:
+      - application/json
+      description: Create a new list
+      parameters:
+      - description: New list data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateTodoListDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.createResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a list
+      tags:
+      - Lists
+  /api/lists/{listID}:
+    delete:
+      description: Delete a list by its ID
+      parameters:
+      - description: List ID
+        in: path
+        name: listID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a list
+      tags:
+      - Lists
+    get:
+      description: Get a list by its ID
+      parameters:
+      - description: List ID
+        in: path
+        name: listID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TodoList'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get a list by ID
+      tags:
+      - Lists
+    patch:
+      consumes:
+      - application/json
+      description: Update a list by its ID
+      parameters:
+      - description: List ID
+        in: path
+        name: listID
+        required: true
+        type: string
+      - description: Updated list data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateTodoListDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a list
+      tags:
+      - Lists
+  /api/lists/{listID}/items:
+    get:
+      description: Get all items for a specific list
+      parameters:
+      - description: List ID
+        in: path
+        name: listID
+        required: true
+        type: string
+      - description: Sort items by
+        in: query
+        name: sort_by
+        type: string
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.resourceResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all items
+      tags:
+      - Items
+    post:
+      consumes:
+      - application/json
+      description: Create a new item for a specific list
+      parameters:
+      - description: List ID
+        in: path
+        name: listID
+        required: true
+        type: string
+      - description: New item data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateTodoItemDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/handler.createResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create an item
+      tags:
+      - Items
+  /api/lists/{listID}/items/{itemID}:
+    delete:
+      description: Delete an item by its ID
+      parameters:
+      - description: Item ID
+        in: path
+        name: itemID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete an item
+      tags:
+      - Items
+    get:
+      description: Get an item by its ID
+      parameters:
+      - description: Item ID
+        in: path
+        name: itemID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.TodoItem'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get an item by ID
+      tags:
+      - Items
+    patch:
+      consumes:
+      - application/json
+      description: Update an item by its ID
+      parameters:
+      - description: Item ID
+        in: path
+        name: itemID
+        required: true
+        type: string
+      - description: Updated item data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateTodoItemDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update an item
+      tags:
+      - Items
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user using email and password
+      parameters:
+      - description: Authentication data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.signInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.signInResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+      summary: Sign In
+      tags:
+      - Auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user
+      parameters:
+      - description: Registration data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateUserDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.createResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/handler.swaggerErrorResponse'
+      summary: Sign Up
+      tags:
+      - Auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

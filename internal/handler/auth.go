@@ -12,6 +12,19 @@ type signInInput struct {
 	Password string `json:"password"`
 }
 
+type signInResponse struct {
+	Token string `json:"token"`
+}
+
+// @Summary Sign In
+// @Description Authenticate user using email and password
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param input body signInInput true "Authentication data"
+// @Success 200 {object} signInResponse
+// @Failure 400 {object} swaggerErrorResponse
+// @Router /auth/sign-in [post]
 func (h *Handler) signIn(c echo.Context) error {
 	var input signInInput
 
@@ -24,11 +37,19 @@ func (h *Handler) signIn(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{
-		"token": token,
-	})
+	return c.JSON(http.StatusOK, signInResponse{Token: token})
 }
 
+// @Summary Sign Up
+// @Description Register a new user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param input body model.CreateUserDTO true "Registration data"
+// @Success 200 {object} createResponse
+// @Failure 400 {object} swaggerErrorResponse
+// @Failure 409 {object} swaggerErrorResponse
+// @Router /auth/sign-up [post]
 func (h *Handler) signUp(c echo.Context) error {
 	var input model.CreateUserDTO
 
@@ -41,7 +62,5 @@ func (h *Handler) signUp(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusConflict, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{
-		"id": id,
-	})
+	return c.JSON(http.StatusOK, createResponse{ID: id.String()})
 }
