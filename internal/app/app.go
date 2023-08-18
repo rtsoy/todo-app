@@ -1,6 +1,13 @@
 package app
 
 import (
+	"context"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
@@ -14,6 +21,8 @@ import (
 	"github.com/sirupsen/logrus"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
+
+const gracefulShutdownTimeout = 3 * time.Second
 
 func Run(cfg *config.Config) {
 	e := echo.New()
@@ -35,5 +44,32 @@ func Run(cfg *config.Config) {
 
 	hndlr.InitRoutes(e)
 
-	log.Fatal(e.Start(cfg.HTTPPort))
+	go func() {
+		if err := e.Start(cfg.HTTPPort); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Error while starting the echo server: %s", err.Error())
+		} else {
+			log.Println("Todo App started...")
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT, os.Interrupt)
+	<-quit
+
+	ctx, cancel := context.WithTimeout(context.Background(), gracefulShutdownTimeout)
+	defer cancel()
+
+	if err := e.Shutdown(ctx); err != nil {
+		log.Fatalf("Error while shutting down the server: %s", err.Error())
+	} else {
+		log.Println("Server shut down gracefully.")
+	}
+
+	if err := db.Close(); err != nil {
+		log.Fatalf("Error while closing the database: %s", err.Error())
+	} else {
+		log.Println("Database connection closed.")
+	}
+
+	log.Println("Exiting... Have a nice day!")
 }
